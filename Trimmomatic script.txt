@@ -1,0 +1,26 @@
+###########################################
+#For Running on Owens
+#PBS -N trimmingfastqs
+#PBS -l nodes=1:ppn=12
+#PBS -m abe
+#PBS -M bailest@mail.uc.edu
+#PBS -l walltime=2:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+###########################################
+
+module load java/1.8.0_131
+
+export PATH=${PATH}:${HOME}/bin:$HOME/local/src/Trimmomatic-0.38/ #export paths in environment
+export PATH=${PATH}:${HOME}/bin:$HOME/local/src/Trimmomatic-0.38/trimmomatic-0.3.8.jar/ #export paths in environment
+
+#file1
+java -jar $HOME/local/src/Trimmomatic-0.38/trimmomatic-0.38.jar 
+PE
+C1_N_o_1_1.fq.gz
+C1_N_o_1_2.fq.gz
+C1_N_o_1_1.paired.fq.gz
+C1_N_o_1_1.unpaired.fq.gz
+C1_N_o_2_1.paired.fq.gz
+C1_N_o_2_2.unpaired.fq.gz
+ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36 HEADCROP:10
