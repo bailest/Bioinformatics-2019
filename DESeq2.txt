@@ -5,13 +5,14 @@
 #PBS -m abe -M bailest@mail.uc.edu
 #PBS -l walltime=1:00:00
 ulimit -s unlimited
-#PBS -A PES0759
+#PBS -A PES0756
 #PBS -j oe
 #PBS -S /bin/bash
 
 export PATH=${PATH}:${HOME}/bin:$HOME/local/src/trinityrnaseq-Trinity-v2.8.4:/bin:$PATH
 export PATH=${PATH}:${HOME}/bin:$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/trinity-plugins:/bin:$PATH
 export PATH=${PATH}:${HOME}/bin:$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/trinity-plugins/BIN:/bin:$PATH
+export R_LIBS=~/local/R_libs
 #export PATH=${PATH}:${HOME}/bin:$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/trinity-plugins/BIN/jellyfish-1.1.12/bin:/bin:$PATH
 #export PATH=${PATH}:${HOME}/bin:$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/trinity-plugins/BIN/salmon-latest_linux_x86_64/bin:/bin:$PATH
 
@@ -22,7 +23,7 @@ export TRINITY_HOME=$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/
 module load python
 module load samtools
 module load bowtie2
-module load R
+module load R/3.5.2
 module load boost
 module load java
 
@@ -31,26 +32,33 @@ module use $HOME/local/share/lmodfiles
 module load jellyfish
 module load salmon/0.13.1
 
+mkdir /fs/scratch/PES0756/bailest/trinity/outputs
+cd /fs/scratch/PES0756/bailest/trinity
 
-cd /fs/scratch/PES0756/trinity
 
 $HOME/local/src/trinityrnaseq-Trinity-v2.8.4/util/align_and_estimate_abundance.pl \
 --transcripts Trinity.fasta \
 --seqType fq \
---samples_file file.txt \
+--samples_file /fs/scratch/PES0756/bailest/trinity/file.txt \
 --est_method salmon \
---output_dir /fs/scratch/PES0756/trinity/outputs/ \
+--output_dir /fs/scratch/PES0756/bailest/trinity/outputs/ \
 --SS_lib_type FR \
---trinity_mode \
 --prep_reference
 
 
-#$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/util/abundance_estimates_to_matrix.pl \
-#--est_method salmon \
-#--gene_trans_map none \
-#--quant_files file.listing.targetfiles.txt
+$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/util/abundance_estimates_to_matrix.pl \
+--est_method salmon \
+--gene_trans_map none \
+--name_sample_by_basedir \
+/fs/scratch/PES0756/bailest/trinity/cond_C1_N_rep1/quant.sf \
+/fs/scratch/PES0756/bailest/trinity/cond_C1_N_rep2/quant.sf \
+/fs/scratch/PES0756/bailest/trinity/cond_C1_N_rep3/quant.sf \
+/fs/scratch/PES0756/bailest/trinity/cond_S1_N_rep1/quant.sf \
+/fs/scratch/PES0756/bailest/trinity/cond_S1_N_rep2/quant.sf \
+/fs/scratch/PES0756/bailest/trinity/cond_S1_N_rep3/quant.sf
 
-#$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/Analysis/DifferentialExpression/run_DE_analysis.pl \
-#--matrix counts.matrix \
-#--method DESeq2 \
-#--samples_file file.txt \
+
+$HOME/local/src/trinityrnaseq-Trinity-v2.8.4/Analysis/DifferentialExpression/run_DE_analysis.pl \
+--matrix salmon.isoform.counts.matrix \
+--method DESeq2 \
+--samples_file file.txt
